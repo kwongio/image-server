@@ -18,14 +18,21 @@ spec:
       labels:
         app: image-server
     spec:
+      volumes:
+        - name: image-volume
+          emptyDir: {}
       containers:
         - name: image
           image: rldh9037/image-server:0.0.1
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: image-volume
+              mountPath: /images
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: dev
             - name: IMAGE_PATH
-              value: images
+              value: /images
           resources:
             requests:
               memory: "512Mi"
@@ -36,7 +43,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh","-c","sleep 10"]
+                command: ["/bin/sh", "-c", "sleep 10"]
           readinessProbe:
             httpGet:
               path: /healthcheck/ready
